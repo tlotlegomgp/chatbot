@@ -9,6 +9,7 @@ class UserSession(models.Model):
     STATE_CHOICES = (
         ('greeting', 'Greeting'),
         ('question', 'Question'),
+        ('answer', 'Answer'),
         ('end', 'End'),
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
