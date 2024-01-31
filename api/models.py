@@ -12,7 +12,6 @@ class UserSession(models.Model):
         ('answer', 'Answer'),
         ('end', 'End'),
     )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
     session_id = models.CharField(max_length=255, unique=True)
     current_state = models.CharField(
         max_length=50, 

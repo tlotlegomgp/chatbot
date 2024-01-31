@@ -1,0 +1,185 @@
+{% extends 'index/header.html' %}
+{% load static %}
+
+{% block content %}
+<style type="text/css">
+    .speech-bubble, .speech-bubble-mate {
+    position: relative;
+    border-radius: .4em;
+    max-width: 75%;
+    margin-top: 10px;
+    color: rgb(28, 40, 38);
+    font-weight: 500;
+    }
+
+    .speech-bubble {
+        background: #C9D5B5;
+    }
+
+    .speech-bubble-mate {
+        background: #C4F4C7;
+    }
+
+    .speech-bubble-mate:after, .speech-bubble:after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 0;
+        height: 0;
+        border: 28px solid transparent;
+        border-top: 0;
+        margin-top: -14px;
+    }
+
+    .speech-bubble:after {
+        right: 0;
+        border-left-color: #C9D5B5;
+        border-right: 0;
+        margin-right: -10px;
+    }
+
+    .speech-bubble-mate:after {
+        left: 0;
+        border-right-color: #C4F4C7;
+        border-left: 0;
+        margin-left: -10px;
+    }
+
+    .chat-bubble {
+        border-radius: 5px;
+        padding: 8px;
+        padding-bottom: 30px;
+        margin: 5px 0;
+        background-color: #eee;
+    }
+
+    .chat-bubble-left {
+        float: left;
+    }
+
+    .chat-bubble-right {
+        float: right;
+    }
+</style>
+
+<div class="row">
+    <div class="col col-sm-12 col-md-8 mx-auto">
+        <div style="padding: 40px;">
+            <div class="row text-center">
+                <h2 style="padding: 10px; color: #4E3160;">Chatbot</h2>
+            </div>
+        
+            <div id="app">
+                <div class="card my-5" style="background: #243E36;">
+                    <div class="card" style="min-height: 500px;">
+                        <div class="card-body">
+                            <div class="chat-container">
+                                <div v-for="(chat, index) in chatHistory" :key="index" class="chat-bubble">
+                                  <div :class="{ 'chat-bubble-left': index % 2 !== 0, 'chat-bubble-right': index % 2 === 0 }">
+                                    [[ chat ]]
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: absolute; bottom: 0; left:0; right:0; margin: 10px; margin-bottom: 30px;">
+                        <div class="input-group">
+                            <input type="text" v-model="userInput" class="form-control" @keyup.enter="queryChat">
+                            <div class="input-group-append">
+                                <button
+                                    @click="queryChat"
+                                    class="btn"
+                                    style="background: #4E3160; color: aliceblue;"
+                                >
+                                    &nbsp;Send&nbsp;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app',
+        data: {
+            sessionID: '{{session_id}}',
+            chatHistory: [],
+            userInput: '',
+            fetchingNewResponse: false,
+        },
+        methods: {
+            async queryChat() {
+                this.fetchingNewResponse = true;
+                this.chatHistory.push(this.userInput);
+                
+                await axios
+                    .post(
+                        "chat/", 
+                        {
+                            user_input: this.userInput,
+                            session_id: this.sessionID
+                        }
+                    )
+                    .then((response) => {
+                        if (response.status === 200) {
+                            console.log(response);
+                            this.chatHistory.push(response.data.message);
+                        }
+                    }).catch((error) => {
+                        console.log(error);
+                    }).finally(()=> {
+                        this.fetchingNewResponse = false;
+                        this.userInput = "";
+                    })
+            },
+            async wakeChat() {
+                await axios
+                    .get("chat/")
+                    .then((response) => {
+                        if (response.status === 200) {
+                            console.log(response);
+                            this.chatHistory.push(response.data.message);
+                        }
+                    }).catch((error) => {
+                        console.log(error);
+                    }).finally(()=> {
+                        this.fetchingNewResponse = false;
+                    })
+            },
+            formatDateTime(datetime){
+                const dateTime = new Date(datetime);
+                const options = {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                };
+
+                const formattedDateTime = dateTime.toLocaleString('en-US', options);
+                return formattedDateTime
+            },
+            isOdd(index) {
+                return index % 2 !== 0;
+            }
+        },
+
+        computed: {
+            customer_match_score() {
+                return 100
+            },
+        },
+
+        mounted() {
+            console.log(this.sessionID);
+            this.wakeChat();
+        }
+    });
+</script>
+
+{% endblock %}

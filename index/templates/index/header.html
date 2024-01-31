@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        {% load static %}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>
+            Chatbot
+        </title>
+
+        <link href="{% static 'index/css/bootstrap.min.css' %}" rel="stylesheet">
+        <link href="{% static 'index/css/style.css' %}" rel="stylesheet">
+        <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+        <script>
+            axios.defaults.withCredentials = true;
+            axios.defaults.xsrfCookieName = "csrftoken";
+            axios.defaults.xsrfHeaderName = "X-CSRFToken";
+            axios.defaults.headers.post["Content-Type"] = "application/json";
+        
+            var baseURL = window.location.protocol + "//{{ request.get_host }}/api/";
+            axios.defaults.baseURL = baseURL;
+        </script>        
+        
+        <style>
+            body {
+              font-family: 'Montserrat';
+            }
+        </style>
+    </head>
+
+    <body style="background-color: #f5f5f5;">
+        {% block content %}  {% endblock %}
+    </body>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.slim.min.js" integrity="sha256-a2yjHM4jnF9f54xUQakjZGaqYs/V1CYvWpoqZzC2/Bw=" crossorigin="anonymous"></script>
+    <script src="{% static 'index/js/bootstrap.min.js' %}"></script>
+
+    <script type="text/javascript">
+        setTimeout(function(){
+            $(".myAlert-top").remove();
+        }, 5000);
+    </script>
+</html>

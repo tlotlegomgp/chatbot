@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'api',
     'index',
+    'account',
     
     'rest_framework'
 
@@ -127,3 +128,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+from django.contrib.messages import constants as messages
+
+MESSAGE_TAGS = {
+    messages.INFO: "alert-info",
+    messages.WARNING: "alert-warning",
+    messages.ERROR: "alert-danger",
+    messages.SUCCESS: "alert-success",
+    messages.DEBUG: "alert-info",
+}
